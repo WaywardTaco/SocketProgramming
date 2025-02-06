@@ -1,5 +1,5 @@
-import java.net.*;
 import java.io.*;
+import java.net.*;
 
 public class CSNETWKClient
 {
@@ -7,18 +7,21 @@ public class CSNETWKClient
 	{
 		String sServerAddress = args[0];
 		int nPort = Integer.parseInt(args[1]);
+		String sUsername = args[2];
+		String sMessage = args[3];
 		
+		System.out.println(sUsername + ": Connecting to server at /" + sServerAddress + ":" + nPort);
 		try
 		{
 			Socket clientEndpoint = new Socket(sServerAddress, nPort);
 			
-			System.out.println("Client: Connected to server at" + clientEndpoint.getRemoteSocketAddress());
+			System.out.println(sUsername + ": Connected to server at " + clientEndpoint.getRemoteSocketAddress());
 			
 			DataOutputStream dosWriter = new DataOutputStream(clientEndpoint.getOutputStream());
-			dosWriter.writeUTF("Client: Hello from client" + clientEndpoint.getLocalSocketAddress());
-			
+			sendMessage(dosWriter, sUsername, sMessage);
+
 			DataInputStream disReader = new DataInputStream(clientEndpoint.getInputStream());
-			System.out.println(disReader.readUTF());
+			receiveMessage(disReader);
 			
 			clientEndpoint.close();
 		}
@@ -28,7 +31,16 @@ public class CSNETWKClient
 		}
 		finally
 		{
-			System.out.println("Client: Connection is terminated.");
+			System.out.println(sUsername + ": Connection terminated.");
 		}
+	}
+
+	private static void sendMessage(DataOutputStream output, String username, String message) throws IOException{
+		output.writeUTF(username);
+		output.writeUTF(message);
+	}
+
+	private static void receiveMessage(DataInputStream input) throws IOException{
+		System.out.println(input.readUTF());
 	}
 }
